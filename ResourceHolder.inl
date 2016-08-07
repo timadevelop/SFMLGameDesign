@@ -5,9 +5,10 @@ void ResourceHolder<Resource, Identifier>::load(Identifier id, const std::string
 	std::unique_ptr<Resource> resource(new Resource());
 	if (!resource->loadFromFile(filename))
 		throw std::runtime_error("ResourseHolder : Failed to load " + filename);
-	
+
 	// if no errors - inserting
-	insert(id, resource);
+	insert(id, std::move(resource));
+	// we use std::move, giving all rights of ptr for function.. currect ptr will be deleted
 }
 
 template <typename Resource, typename Identifier>
@@ -19,7 +20,7 @@ void ResourceHolder<Resource, Identifier>::load(Identifier id, const std::string
 	if (!resource->loadFromFile(filename, secondParam))
 		throw std::runtime_error("ResourseHolder : Failed to load " + filename);
 
-	insert(id, resource);
+	insert(id, std::move(resource));
 }
 
 template <typename Resource, typename Identifier>
