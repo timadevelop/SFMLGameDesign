@@ -66,7 +66,7 @@ void World::buildScene() {
     mPlayerAircraft->attachChild(std::move(leftEscort));
 
 
-    std::unique_ptr<Aircraft> rightEscort = new Aircraft(Aircraft::Type::Raptor, mTextures);
+    std::unique_ptr<Aircraft> rightEscort(new Aircraft(Aircraft::Type::Raptor, mTextures));
     rightEscort->setPosition(80.f, 50.f); // relative to leader
     mPlayerAircraft->attachChild(std::move(rightEscort));
 }
