@@ -7,6 +7,18 @@
 #include <assert.h>
 #include <memory>
 
+
+namespace Textures
+{
+	enum class ID
+	{
+		Eagle,
+		Raptor,
+		Desert
+	};
+}
+
+
 template <typename Resource, typename Identifier>
 class ResourceHolder
 {

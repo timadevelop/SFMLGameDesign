@@ -6,17 +6,66 @@
 #include <assert.h>
 #include "SceneNode.h"
 
-void SceneNode::atttachChild(sceneUptr child)
+SceneNode::SceneNode() : mChildren(), mParent(nullptr)
+{}
+
+void SceneNode::update(sf::Time dt){
+    updateCurrent(dt);
+    updateChildren(dt);
+}
+void SceneNode::updateChildren(sf::Time dt) {
+    for(sceneUptr& child : mChildren)
+    {
+        child->update(dt);
+    }
+}
+void SceneNode::updateCurrent(sf::Time dt) { }
+
+// Drawing
+
+void SceneNode::draw(sf::RenderTarget &target, sf::RenderStates states) const
+{
+    states.transform *= getTransform();
+    drawCurrent(target, states);
+    drawChildren(target, states);
+}
+
+void SceneNode::drawCurrent(sf::RenderTarget &target, sf::RenderStates states) const {}
+void SceneNode::drawChildren(sf::RenderTarget &target, sf::RenderStates states) const
+{
+    // recursively drawing all children
+    for( const sceneUptr& child : mChildren) // why sceneUptr&
+    {
+        child->draw(target, states);
+    }
+}
+
+//
+
+sf::Transform SceneNode::getWorldTransform() const {
+    sf::Transform transform = sf::Transform::Identity;
+    for(const SceneNode* node = this; node != nullptr; node = node->mParent)
+        transform = node->getTransform() * transform; // left.combine(r)
+
+    return transform;
+}
+
+sf::Vector2f SceneNode::getWorldPosition() const {
+    return  getWorldTransform() * sf::Vector2f(); // left.transformPoint(r)
+}
+
+// childs
+
+void SceneNode::attachChild(sceneUptr child)
 {
     child->mParent = this;
     mChildren.push_back(std::move(child)); // "moving" ownership to STL container
 }
 
-
 SceneNode::sceneUptr SceneNode::detachChild(const SceneNode &node)
 {
     auto found = std::find_if(mChildren.begin(), mChildren.end(),
-    [&] (sceneUptr& p) -> bool {return p.get() == &node;} );
+                              [&] (sceneUptr& p) -> bool {return p.get() == &node;} );
     // http://en.cppreference.com/w/cpp/memory/unique_ptr/get
 
     assert(found != mChildren.end());
@@ -25,25 +74,4 @@ SceneNode::sceneUptr SceneNode::detachChild(const SceneNode &node)
     result->mParent = nullptr;
     mChildren.erase(found);
     return result;
-}
-
-void SceneNode::draw(sf::RenderTarget &target, sf::RenderStates states) const
-{
-    states.transform *= getTransform();
-    drawCurrent(target, states);
-    drawChildren(target, states)
-}
-
-void SceneNode::drawCurrent(sf::RenderTarget &target, sf::RenderStates states) const
-{
-
-}
-
-void SceneNode::drawChildren(sf::RenderTarget &target, sf::RenderStates states) const
-{
-    // recursively drawing all children
-    for( const sceneUptr& child : mChildren) // why sceneUptr&
-    {
-        child->draw(target, states);
-    }
 }

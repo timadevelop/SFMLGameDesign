@@ -11,6 +11,7 @@
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/NonCopyable.hpp>
+#include <SFML/System/Time.hpp>
 
 class SceneNode : public sf::Transformable, public sf::Drawable,
                   private sf::NonCopyable // no copy constructor
@@ -18,10 +19,18 @@ class SceneNode : public sf::Transformable, public sf::Drawable,
 public:
     typedef std::unique_ptr<SceneNode> sceneUptr;
     SceneNode();
-    void atttachChild(sceneUptr child); // take ownership of scene node
+    void update(sf::Time dt);
+    void attachChild(sceneUptr child); // take ownership of scene node
     sceneUptr detachChild(const SceneNode& node); // if return value is ignored it will be destroyed
 
+public:
+    sf::Transform getWorldTransform() const;
+    sf::Vector2f getWorldPosition() const;
+
+
 private:
+    void updateChildren(sf::Time dt);
+    virtual void updateCurrent(sf::Time dt);
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
     virtual void drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
     virtual void drawChildren(sf::RenderTarget& target, sf::RenderStates states) const;

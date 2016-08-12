@@ -6,18 +6,24 @@
 #define GAME_AIRCRAFT_H
 
 
-class Aircraft {
+#include <SFML/Graphics.hpp>
+#include "Entity.h"
+#include "ResourceHolder.hpp"
+class Aircraft : public Entity
+{
 public:
-    enum Type
+    typedef ResourceHolder<sf::Texture, Textures::ID> TextureHolder;
+    enum class Type
     {
         Eagle,
         Raptor,
     };
-    explicit Aircraft(Type type);
+    explicit Aircraft(Type type, const TextureHolder& textures);
+    virtual void drawCurrent(sf::RenderTarget& target, sf::RenderStates states) const;
 
 private:
     Type mType;
+    sf::Sprite mSprite;
 };
-
 
 #endif //GAME_AIRCRAFT_H
