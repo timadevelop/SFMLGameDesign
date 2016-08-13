@@ -12,6 +12,7 @@
 #include "SceneNode.h"
 #include "SpriteNode.h"
 #include "Aircraft.h"
+#include "CommandQueue.h"
 
 class World : sf::NonCopyable{
 public:
@@ -19,6 +20,8 @@ public:
     void update(sf::Time dt);
     void draw();
 
+public:
+    CommandQueue& getCommandQueue();
 private:
     void loadTextures();
     void buildScene();
@@ -35,6 +38,8 @@ private:
     ResourceHolder<sf::Texture, Textures::ID> mTextures;
     SceneNode mSceneGraph;
     std::array<SceneNode*, Layer::LayerCount> mSceneLayers;
+
+    CommandQueue mCommandQueue;
 
     sf::FloatRect mWorldBounds;
     sf::Vector2f mSpawnPosition;

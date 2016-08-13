@@ -32,8 +32,9 @@ void Game::run()
 		while (timeSinceLastUpdate > FRAMERATE_LIMIT_IN_SECONDS) // if it`s time for new frame
 		{
 			timeSinceLastUpdate -= FRAMERATE_LIMIT_IN_SECONDS;
-			processEvents(); // but we`re still catch user input
-			update(FRAMERATE_LIMIT_IN_SECONDS); // eventually @skipping@ some frames if there are 1+ loops
+			processInput(); // but we`re still catch user input
+			if(!mIsPaused)
+				update(FRAMERATE_LIMIT_IN_SECONDS); // eventually @skipping@ some frames if there are 1+ loops
 		}
 		
 		updateStatistics(elapsedTime);
@@ -41,24 +42,24 @@ void Game::run()
 	}
 }
 
-void Game::processEvents()
-{
+void Game::processInput() {
+	CommandQueue& commands = mWorld.getCommandQueue();
+
 	sf::Event event;
-	while (mWindow.pollEvent(event))
+	while(mWindow.pollEvent(event))
 	{
-		switch (event.type)
-		{
-		case sf::Event::KeyPressed:
-			handlePlayerInput(event.key.code, true);
-			break;
-		case sf::Event::KeyReleased:
-			handlePlayerInput(event.key.code, false);
-			break;
-		case sf::Event::Closed:
+		//mPlayer.handleEvent(event, commands);
+
+		if(event.type == sf::Event::Closed)
 			mWindow.close();
-			break;
-		}
+		else if(event.type == sf::Event::GainedFocus)
+			mIsPaused = false;
+		else if(event.type == sf::Event::LostFocus)
+			mIsPaused = true;
 	}
+
+	//mPlayer.handleRealtimeInput(commands);
+
 }
 
 void Game::update(sf::Time deltaTime)
@@ -80,10 +81,6 @@ void Game::updateStatistics(sf::Time elapsedTime)
 		mStatisticsUpdateTime -= sf::seconds(1.0f);
 		mStatisticsNumFrames = 0;
 	}
-}
-
-void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
-{
 }
 
 void Game::render()

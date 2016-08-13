@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <assert.h>
 #include "SceneNode.h"
+#include "Category.h"
 
 SceneNode::SceneNode() : mChildren(), mParent(nullptr)
 {}
@@ -74,4 +75,18 @@ SceneNode::sceneUptr SceneNode::detachChild(const SceneNode &node)
     result->mParent = nullptr;
     mChildren.erase(found);
     return result;
+}
+
+// Comands
+
+unsigned int SceneNode::getCategory() const {
+    return Category::Scene;
+}
+
+void SceneNode::onCommand(const Command &command, sf::Time dt) {
+    if(command.category & getCategory()) // if current scene node is a receiver
+        command.action(*this, dt);
+
+    for(sceneUptr& child : mChildren)
+        child->onCommand(command, dt);
 }

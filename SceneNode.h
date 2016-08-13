@@ -12,6 +12,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Time.hpp>
+#include "Command.h"
 
 class SceneNode : public sf::Transformable, public sf::Drawable,
                   private sf::NonCopyable // no copy constructor
@@ -22,6 +23,11 @@ public:
     void update(sf::Time dt);
     void attachChild(sceneUptr child); // take ownership of scene node
     sceneUptr detachChild(const SceneNode& node); // if return value is ignored it will be destroyed
+
+public:
+    virtual unsigned int getCategory() const;
+    void onCommand(const Command& command, sf::Time dt);
+
 
 public:
     sf::Transform getWorldTransform() const;
