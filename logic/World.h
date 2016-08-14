@@ -8,11 +8,11 @@
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
-#include "ResourceHolder.hpp"
-#include "SceneNode.h"
-#include "SpriteNode.h"
-#include "Aircraft.h"
-#include "CommandQueue.h"
+#include "../utilities/ResourceHolder.hpp"
+#include "../nodes/SceneNode.h"
+#include "../nodes/SpriteNode.h"
+#include "../entities/Aircraft.h"
+#include "../commands/CommandQueue.h"
 
 class World : sf::NonCopyable{
 public:

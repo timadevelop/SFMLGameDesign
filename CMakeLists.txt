@@ -7,7 +7,7 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-set(SOURCE_FILES main.cpp Game.h Game.cpp ResourceHolder.hpp ResourceHolder.inl StringHelpers.hpp Entity.cpp Entity.h Aircraft.cpp Aircraft.h SceneNode.cpp SceneNode.h SpriteNode.cpp SpriteNode.h World.cpp World.h Command.cpp Command.h Category.cpp Category.h CommandQueue.cpp CommandQueue.h Player.cpp Player.h)
+set(SOURCE_FILES main.cpp Game.h Game.cpp ./utilities/ResourceHolder.hpp ./utilities/ResourceHolder.inl ./utilities/StringHelpers.hpp ./entities/Entity.cpp ./entities/Entity.h ./entities/Aircraft.cpp ./entities/Aircraft.h ./nodes/SceneNode.cpp ./nodes/SceneNode.h ./nodes/SpriteNode.cpp ./nodes/SpriteNode.h ./logic/World.cpp ./logic/World.h ./commands/Command.cpp ./commands/Command.h ./commands/Category.cpp ./commands/Category.h ./commands/CommandQueue.cpp ./commands/CommandQueue.h ./entities/Player.cpp ./entities/Player.h)
 add_executable(Game ${SOURCE_FILES})
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake_modules")

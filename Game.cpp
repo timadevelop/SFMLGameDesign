@@ -1,6 +1,6 @@
 #include "Game.h"
-#include "StringHelpers.hpp"
-#include "Aircraft.h"
+#include "./utilities/StringHelpers.hpp"
+#include "./commands/CommandQueue.h"
 
 Game::Game()
 	: mWindow(sf::VideoMode(640, 480), "App")

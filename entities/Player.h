@@ -7,7 +7,7 @@
 
 
 #include <SFML/Window/Event.hpp>
-#include "CommandQueue.h"
+#include "../commands/CommandQueue.h"
 
 class Player {
 public:

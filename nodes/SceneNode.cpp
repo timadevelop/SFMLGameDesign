@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <assert.h>
 #include "SceneNode.h"
-#include "Category.h"
+#include "../commands/Category.h"
 
 SceneNode::SceneNode() : mChildren(), mParent(nullptr)
 {}

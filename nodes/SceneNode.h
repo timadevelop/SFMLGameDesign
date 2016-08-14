@@ -12,7 +12,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/Time.hpp>
-#include "Command.h"
+#include "../commands/Command.h"
 
 class SceneNode : public sf::Transformable, public sf::Drawable,
                   private sf::NonCopyable // no copy constructor

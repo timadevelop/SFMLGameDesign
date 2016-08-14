@@ -7,7 +7,7 @@
 
 
 #include <queue>
-#include "Command.h"
+#include "./Command.h"
 
 class CommandQueue {
 public:

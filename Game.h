@@ -2,9 +2,9 @@
 #define GAME_H
 
 #include <SFML/Graphics.hpp>
-#include "ResourceHolder.hpp"
-#include "World.h"
-#include "Player.h"
+#include "./utilities/ResourceHolder.hpp"
+#include "./logic/World.h"
+#include "./entities/Player.h"
 
 class Game
 {

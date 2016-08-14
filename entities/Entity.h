@@ -7,7 +7,7 @@
 
 
 #include <SFML/System.hpp>
-#include "SceneNode.h"
+#include "../nodes/SceneNode.h"
 
 class Entity : public SceneNode {
 public:

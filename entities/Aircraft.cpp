@@ -3,7 +3,7 @@
 //
 
 #include "Aircraft.h"
-#include "Category.h"
+#include "../commands/Category.h"
 
 Textures::ID toTextureID(Aircraft::Type type)
 {
