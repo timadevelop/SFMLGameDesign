@@ -7,7 +7,7 @@
 #include "Player.h"
 
 void Player::handleRealtimeInput(CommandQueue &commands) {
-    const float  playerSpeed = 4.f;
+    const float  playerSpeed = 200.f;
 
     sf::Vector2f vel;
 

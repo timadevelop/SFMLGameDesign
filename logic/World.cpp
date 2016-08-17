@@ -88,8 +88,9 @@ void World::update(sf::Time dt) {
     if(position.x <= mWorldBounds.left + 150 || position.x >= mWorldBounds.left + mWorldBounds.width - 150)
     {
         // bad collision realisation
+
         velocity.x = -velocity.x;
-        mPlayerAircraft->move(velocity);
+        mPlayerAircraft->move(velocity * dt.asSeconds());
     }
 
     mSceneGraph.update(dt);
