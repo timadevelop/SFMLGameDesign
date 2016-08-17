@@ -57,7 +57,7 @@ void World::buildScene() {
     std::unique_ptr<Aircraft> leader(new Aircraft(Aircraft::Type::Eagle, mTextures));
     mPlayerAircraft = leader.get(); // no ownership
     mPlayerAircraft->setPosition(mSpawnPosition);
-    mPlayerAircraft->setVelocity(40.f, mScrollSpeed);
+    mPlayerAircraft->setVelocity(0.f, 0.f);
     mSceneLayers[Air]->attachChild(std::move(leader));
 
     // escort
@@ -80,18 +80,21 @@ void World::draw() {
 void World::update(sf::Time dt) {
     mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());
 
+    // Forward commands to scene graph
+    while(!mCommandQueue.isEmpty())
+        mSceneGraph.onCommand(mCommandQueue.pop(), dt);
+
+
     sf::Vector2f position = mPlayerAircraft->getPosition();
     sf::Vector2f velocity = mPlayerAircraft->getVelocity();
 
     if(position.x <= mWorldBounds.left + 150 || position.x >= mWorldBounds.left + mWorldBounds.width - 150)
     {
         velocity.x = -velocity.x;
-        mPlayerAircraft->setVelocity(velocity);
+        mPlayerAircraft->move(velocity);
     }
 
-    // Forward commands to scene graph
-    while(!mCommandQueue.isEmpty())
-        mSceneGraph.onCommand(mCommandQueue.pop(), dt);
+    mPlayerAircraft->move(mPlayerAircraft->getVelocity());
 
     mSceneGraph.update(dt);
 }

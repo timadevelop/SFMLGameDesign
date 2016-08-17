@@ -27,7 +27,7 @@ private:
 private:
 	sf::RenderWindow mWindow;
 	World mWorld;
-//	Player mPlayer;
+	Player mPlayer;
 	sf::Text mStatisticsText;
 	sf::Time mStatisticsUpdateTime;
 	std::size_t mStatisticsNumFrames = 0;

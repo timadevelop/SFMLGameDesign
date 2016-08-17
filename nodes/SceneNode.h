@@ -27,8 +27,6 @@ public:
 public:
     virtual unsigned int getCategory() const;
     void onCommand(const Command& command, sf::Time dt);
-
-
 public:
     sf::Transform getWorldTransform() const;
     sf::Vector2f getWorldPosition() const;

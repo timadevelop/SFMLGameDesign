@@ -20,7 +20,9 @@ void SceneNode::updateChildren(sf::Time dt) {
         child->update(dt);
     }
 }
-void SceneNode::updateCurrent(sf::Time dt) { }
+
+// Make it virtual and overload for entities
+void SceneNode::updateCurrent(sf::Time dt) {}
 
 // Drawing
 

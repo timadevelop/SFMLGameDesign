@@ -43,23 +43,22 @@ void Game::run()
 }
 
 void Game::processInput() {
-	CommandQueue& commands = mWorld.getCommandQueue();
+	CommandQueue &commands = mWorld.getCommandQueue();
 
 	sf::Event event;
-	while(mWindow.pollEvent(event))
-	{
-		//mPlayer.handleEvent(event, commands);
+	while (mWindow.pollEvent(event)) {
+		mPlayer.handleEvent(event, commands);
 
-		if(event.type == sf::Event::Closed)
+		if (event.type == sf::Event::Closed)
 			mWindow.close();
-		else if(event.type == sf::Event::GainedFocus)
+		else if (event.type == sf::Event::GainedFocus)
 			mIsPaused = false;
-		else if(event.type == sf::Event::LostFocus)
+		else if (event.type == sf::Event::LostFocus)
 			mIsPaused = true;
 	}
 
-	//mPlayer.handleRealtimeInput(commands);
 
+	mPlayer.handleRealtimeInput(commands);
 }
 
 void Game::update(sf::Time deltaTime)
