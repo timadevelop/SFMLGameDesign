@@ -12,11 +12,12 @@
 
 class Player {
 public:
-    void handleEvent(const sf::Event& event, CommandQueue& commands);
-    void handleRealtimeInput(CommandQueue& commands);
+    void handleEvent(const sf::Event& event, CommandQueue& commands); // handles events from "pollEvent SFML loop"
+    void handleRealtimeInput(CommandQueue& commands); // handles all user`s input outside App.pollEvent
 };
 
 
+// functor for changing velocity of aircraft
 struct AircraftMover
 {
     AircraftMover(float vx, float vy) : velocity(vx, vy) {}

@@ -46,8 +46,6 @@ void World::buildScene() {
     sf::IntRect textureRect(mWorldBounds);
     texture.setRepeated(true);
 
-
-
     // add the background sprite to the scene
     std::unique_ptr<SpriteNode> backgroundSprite(new SpriteNode(texture, textureRect));
     backgroundSprite->setPosition(mWorldBounds.left, mWorldBounds.top);
@@ -64,7 +62,6 @@ void World::buildScene() {
     std::unique_ptr<Aircraft> leftEscort(new Aircraft(Aircraft::Type::Raptor, mTextures));
     leftEscort->setPosition(-80.f, 50.f); // relative to leader
     mPlayerAircraft->attachChild(std::move(leftEscort));
-
 
     std::unique_ptr<Aircraft> rightEscort(new Aircraft(Aircraft::Type::Raptor, mTextures));
     rightEscort->setPosition(80.f, 50.f); // relative to leader
@@ -90,11 +87,10 @@ void World::update(sf::Time dt) {
 
     if(position.x <= mWorldBounds.left + 150 || position.x >= mWorldBounds.left + mWorldBounds.width - 150)
     {
+        // bad collision realisation
         velocity.x = -velocity.x;
         mPlayerAircraft->move(velocity);
     }
-
-    mPlayerAircraft->move(mPlayerAircraft->getVelocity());
 
     mSceneGraph.update(dt);
 }

@@ -21,6 +21,8 @@ public:
     unsigned int category;
 };
 
+
+// converting commands to entity action
 template <typename GameObject, typename Function>
 std::function<void(SceneNode&, sf::Time)> derivedAction(Function fn)
 {

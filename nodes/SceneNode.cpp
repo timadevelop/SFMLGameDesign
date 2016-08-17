@@ -21,7 +21,6 @@ void SceneNode::updateChildren(sf::Time dt) {
     }
 }
 
-// Make it virtual and overload for entities
 void SceneNode::updateCurrent(sf::Time dt) {}
 
 // Drawing
@@ -71,6 +70,7 @@ SceneNode::sceneUptr SceneNode::detachChild(const SceneNode &node)
                               [&] (sceneUptr& p) -> bool {return p.get() == &node;} );
     // http://en.cppreference.com/w/cpp/memory/unique_ptr/get
 
+    // not found
     assert(found != mChildren.end());
 
     sceneUptr result = std::move(*found);
@@ -79,15 +79,14 @@ SceneNode::sceneUptr SceneNode::detachChild(const SceneNode &node)
     return result;
 }
 
-// Comands
-
+// Commands
 unsigned int SceneNode::getCategory() const {
     return Category::Scene;
 }
 
 void SceneNode::onCommand(const Command &command, sf::Time dt) {
     if(command.category & getCategory()) // if current scene node is a receiver
-        command.action(*this, dt);
+        command.action(*this, dt); // invoke command
 
     for(sceneUptr& child : mChildren)
         child->onCommand(command, dt);
