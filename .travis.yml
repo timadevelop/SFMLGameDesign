@@ -5,22 +5,6 @@ language: cpp
 
 matrix:
   include:
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-      env: COMPILER=g++-4.9
-    - compiler: gcc
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-      env: COMPILER=g++-5
     - compiler: clang
       addons:
         apt:
@@ -40,6 +24,11 @@ matrix:
             - clang-3.7
       env: COMPILER=clang++-3.7
 before_install:
+  - sudo apt-get install software-properties-common
+  - sudo add-apt-repository ppa:george-edison55/cmake-3.x
+  - sudo apt-get update
+  - sudo apt-get install cmake
+  - sudo apt-get upgrade
   - sudo apt-get install libsfml-dev
 # Build steps
 before_script:
