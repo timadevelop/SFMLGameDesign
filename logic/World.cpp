@@ -76,22 +76,33 @@ void World::draw() {
 
 void World::update(sf::Time dt) {
     mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());
+    mPlayerAircraft->setVelocity(0.f, 0.f);
+
 
     // Forward commands to scene graph
     while(!mCommandQueue.isEmpty())
         mSceneGraph.onCommand(mCommandQueue.pop(), dt);
 
 
-    sf::Vector2f position = mPlayerAircraft->getPosition();
+
     sf::Vector2f velocity = mPlayerAircraft->getVelocity();
+    if(velocity.x != 0.f && velocity.y != 0.f)  // then correct diagonal speed
+        mPlayerAircraft->setVelocity(velocity / std::sqrt(2.f));
 
-    if(position.x <= mWorldBounds.left + 150 || position.x >= mWorldBounds.left + mWorldBounds.width - 150)
-    {
-        // bad collision realisation
-
-        velocity.x = -velocity.x;
-        mPlayerAircraft->move(velocity * dt.asSeconds());
-    }
+    // *****************
+    //      Collision
+    // *****************
+    sf::FloatRect viewBounds(mWorldView.getCenter() - mWorldView.getSize()/2.f, mWorldView.getSize());
+    const float borderDistance = 40.f;
+    sf::Vector2f position = mPlayerAircraft->getPosition();
+    // Horizontal
+    position.x = std::max(position.x, viewBounds.left + borderDistance);
+    position.x = std::min(position.x, viewBounds.left + viewBounds.width - borderDistance);
+    // Top
+    position.y = std::max(position.y, viewBounds.top + borderDistance);
+    position.y = std::min(position.y, viewBounds.top + viewBounds.height - borderDistance);
+    mPlayerAircraft->setPosition(position);
+    // *****************
 
     mSceneGraph.update(dt);
 }

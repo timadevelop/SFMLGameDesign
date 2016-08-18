@@ -57,7 +57,6 @@ void Game::processInput() {
 			mIsPaused = true;
 	}
 
-
 	mPlayer.handleRealtimeInput(commands);
 }
 

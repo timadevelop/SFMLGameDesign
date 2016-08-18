@@ -11,21 +11,24 @@
 #include "Aircraft.h"
 
 class Player {
+public: // Key bindings
+    enum class Action
+    {
+        MoveLeft, MoveRight, MoveUp, MoveDown, someAction
+    };
+    void assignKey(Action action, sf::Keyboard::Key key);
+    sf::Keyboard::Key getAssignedKey(Action action) const;
+
+private:
+    void initializeActions();
+    static bool isRealtimeAction(Action action);
+    std::map<sf::Keyboard::Key, Action> mkeyBinding;
+    std::map<Action, Command> mActionBinding;
+
+
 public:
+    Player();
     void handleEvent(const sf::Event& event, CommandQueue& commands); // handles events from "pollEvent SFML loop"
     void handleRealtimeInput(CommandQueue& commands); // handles all user`s input outside App.pollEvent
 };
-
-
-// functor for changing velocity of aircraft
-struct AircraftMover
-{
-    AircraftMover(float vx, float vy) : velocity(vx, vy) {}
-
-    void operator() (Aircraft& aircraft, sf::Time) const {
-        aircraft.setVelocity(velocity);
-    }
-    sf::Vector2f velocity;
-};
-
 #endif //GAME_PLAYER_H
