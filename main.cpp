@@ -1,10 +1,10 @@
 #include <iostream>
-#include "Game.h"
+#include "Application.h"
 
 int main()
 {
 	try {
-		Game game;
+		Application game;
 		game.run();
 	} catch (std::exception& e)
 	{

@@ -7,45 +7,67 @@
 
 
 #include <SFML/System/NonCopyable.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/View.hpp>
+#include <SFML/Graphics/Texture.hpp>
+
+#include <array>
+#include <queue>
+
 #include "../utilities/ResourceHolder.hpp"
+#include "../utilities/ResourceIdentifiers.h"
 #include "../nodes/SceneNode.h"
 #include "../nodes/SpriteNode.h"
 #include "../entities/Aircraft.h"
 #include "../commands/CommandQueue.h"
+#include "../commands/Command.h"
 
-class World : sf::NonCopyable{
+
+
+// Forward declaration
+namespace sf
+{
+    class RenderWindow;
+}
+
+class World : private sf::NonCopyable
+{
 public:
-    explicit World(sf::RenderWindow& window);
-    void update(sf::Time dt);
-    void draw();
+    explicit							World(sf::RenderWindow& window);
+    void								update(sf::Time dt);
+    void								draw();
 
-public:
-    CommandQueue& getCommandQueue();
-private:
-    void loadTextures();
-    void buildScene();
+    CommandQueue&						getCommandQueue();
+
 
 private:
-    enum Layer // not class because we need LayerCount integer
+    void								loadTextures();
+    void								buildScene();
+    void								adaptPlayerPosition();
+    void								adaptPlayerVelocity();
+
+
+private:
+    enum Layer
     {
-        Background, Air, LayerCount
+        Background,
+        Air,
+        LayerCount
     };
 
+
 private:
-    sf::RenderWindow& mWindow;
-    sf::View mWorldView;
-    ResourceHolder<sf::Texture, Textures::ID> mTextures;
-    SceneNode mSceneGraph;
-    std::array<SceneNode*, Layer::LayerCount> mSceneLayers;
+    sf::RenderWindow&					mWindow;
+    sf::View							mWorldView;
+    TextureHolder						mTextures;
 
-    CommandQueue mCommandQueue;
+    SceneNode							mSceneGraph;
+    std::array<SceneNode*, LayerCount>	mSceneLayers;
+    CommandQueue						mCommandQueue;
 
-    sf::FloatRect mWorldBounds;
-    sf::Vector2f mSpawnPosition;
-    float mScrollSpeed;
-    Aircraft* mPlayerAircraft;
+    sf::FloatRect						mWorldBounds;
+    sf::Vector2f						mSpawnPosition;
+    float								mScrollSpeed;
+    Aircraft*							mPlayerAircraft;
 };
-
 
 #endif //GAME_WORLD_H
