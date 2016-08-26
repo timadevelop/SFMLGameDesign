@@ -4,109 +4,114 @@
 
 #include "World.h"
 
-World::World(sf::RenderWindow &window)
-: mWindow(window)
-  ,mSceneGraph()
-, mWorldView(window.getDefaultView())
-, mWorldBounds(
-                0.f,                    // top X position
-                0.f,                    // top Y position
-                mWorldView.getSize().x, // width
-                2000.f)                 // height
-, mSpawnPosition(
-                mWorldView.getSize().x / 2.f,
-                mWorldBounds.height - mWorldView.getSize().y / 2.f)
-, mScrollSpeed(-50.f) // negative because mooving upwards
-, mPlayerAircraft(nullptr)
+#include <SFML/Graphics/RenderWindow.hpp>
+
+#include <algorithm>
+#include <cmath>
+
+
+World::World(sf::RenderWindow& window)
+        : mWindow(window)
+        , mWorldView(window.getDefaultView())
+        , mTextures()
+        , mSceneGraph()
+        , mSceneLayers()
+        , mWorldBounds(0.f, 0.f, mWorldView.getSize().x, 2000.f)
+        , mSpawnPosition(mWorldView.getSize().x / 2.f, mWorldBounds.height - mWorldView.getSize().y / 2.f)
+        , mScrollSpeed(-50.f)
+        , mPlayerAircraft(nullptr)
 {
     loadTextures();
     buildScene();
 
-    // setting Default view center
+    // Prepare the view
     mWorldView.setCenter(mSpawnPosition);
 }
 
-void World::loadTextures() {
-    mTextures.load(Textures::ID::Eagle, "Media/Textures/Eagle.png");
-    mTextures.load(Textures::ID::Raptor, "Media/Textures/Raptor.png");
-    mTextures.load(Textures::ID::Desert, "Media/Textures/Desert.png");
-}
-
-void World::buildScene() {
-    for (std::size_t i = 0; i < LayerCount; ++i)
-    {
-        SceneNode::sceneUptr layer(new SceneNode());
-        mSceneLayers[i] = layer.get(); // .get() returns standart pointer without ownership
-
-        mSceneGraph.attachChild(std::move(layer));
-    }
-
-    // tiled background
-    sf::Texture& texture = mTextures.get(Textures::ID::Desert);
-    sf::IntRect textureRect(mWorldBounds);
-    texture.setRepeated(true);
-
-    // add the background sprite to the scene
-    std::unique_ptr<SpriteNode> backgroundSprite(new SpriteNode(texture, textureRect));
-    backgroundSprite->setPosition(mWorldBounds.left, mWorldBounds.top);
-    mSceneLayers[Background]->attachChild(std::move(backgroundSprite)); // .get() base class
-
-    // player initializing
-    std::unique_ptr<Aircraft> leader(new Aircraft(Aircraft::Type::Eagle, mTextures));
-    mPlayerAircraft = leader.get(); // no ownership
-    mPlayerAircraft->setPosition(mSpawnPosition);
+void World::update(sf::Time dt)
+{
+    // Scroll the world, reset player velocity
+    mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());
     mPlayerAircraft->setVelocity(0.f, 0.f);
-    mSceneLayers[Air]->attachChild(std::move(leader));
 
-    // escort
-    std::unique_ptr<Aircraft> leftEscort(new Aircraft(Aircraft::Type::Raptor, mTextures));
-    leftEscort->setPosition(-80.f, 50.f); // relative to leader
-    mPlayerAircraft->attachChild(std::move(leftEscort));
+    // Forward commands to scene graph, adapt velocity (scrolling, diagonal correction)
+    while (!mCommandQueue.isEmpty())
+        mSceneGraph.onCommand(mCommandQueue.pop(), dt);
+    adaptPlayerVelocity();
 
-    std::unique_ptr<Aircraft> rightEscort(new Aircraft(Aircraft::Type::Raptor, mTextures));
-    rightEscort->setPosition(80.f, 50.f); // relative to leader
-    mPlayerAircraft->attachChild(std::move(rightEscort));
+    // Regular update step, adapt position (correct if outside view)
+    mSceneGraph.update(dt);
+    adaptPlayerPosition();
 }
 
-
-void World::draw() {
+void World::draw()
+{
     mWindow.setView(mWorldView);
     mWindow.draw(mSceneGraph);
 }
 
-void World::update(sf::Time dt) {
-    mWorldView.move(0.f, mScrollSpeed * dt.asSeconds());
-    mPlayerAircraft->setVelocity(0.f, 0.f);
+CommandQueue& World::getCommandQueue()
+{
+    return mCommandQueue;
+}
 
+void World::loadTextures()
+{
+    mTextures.load(Textures::Eagle, "Media/Textures/Eagle.png");
+    mTextures.load(Textures::Raptor, "Media/Textures/Raptor.png");
+    mTextures.load(Textures::Desert, "Media/Textures/Desert.png");
+}
 
-    // Forward commands to scene graph
-    while(!mCommandQueue.isEmpty())
-        mSceneGraph.onCommand(mCommandQueue.pop(), dt);
+void World::buildScene()
+{
+    // Initialize the different layers
+    for (std::size_t i = 0; i < LayerCount; ++i)
+    {
+        SceneNode::sceneUptr layer(new SceneNode());
+        mSceneLayers[i] = layer.get();
 
+        mSceneGraph.attachChild(std::move(layer));
+    }
 
+    // Prepare the tiled background
+    sf::Texture& texture = mTextures.get(Textures::Desert);
+    sf::IntRect textureRect(mWorldBounds);
+    texture.setRepeated(true);
 
-    sf::Vector2f velocity = mPlayerAircraft->getVelocity();
-    if(velocity.x != 0.f && velocity.y != 0.f)  // then correct diagonal speed
-        mPlayerAircraft->setVelocity(velocity / std::sqrt(2.f));
+    // Add the background sprite to the scene
+    std::unique_ptr<SpriteNode> backgroundSprite(new SpriteNode(texture, textureRect));
+    backgroundSprite->setPosition(mWorldBounds.left, mWorldBounds.top);
+    mSceneLayers[Background]->attachChild(std::move(backgroundSprite));
 
-    // *****************
-    //      Collision
-    // *****************
-    sf::FloatRect viewBounds(mWorldView.getCenter() - mWorldView.getSize()/2.f, mWorldView.getSize());
+    // Add player's aircraft
+    std::unique_ptr<Aircraft> leader(new Aircraft(Aircraft::Type::Eagle, mTextures));
+    mPlayerAircraft = leader.get();
+    mPlayerAircraft->setPosition(mSpawnPosition);
+    mSceneLayers[Air]->attachChild(std::move(leader));
+}
+
+void World::adaptPlayerPosition()
+{
+    // Keep player's position inside the screen bounds, at least borderDistance units from the border
+    sf::FloatRect viewBounds(mWorldView.getCenter() - mWorldView.getSize() / 2.f, mWorldView.getSize());
     const float borderDistance = 40.f;
+
     sf::Vector2f position = mPlayerAircraft->getPosition();
-    // Horizontal
     position.x = std::max(position.x, viewBounds.left + borderDistance);
     position.x = std::min(position.x, viewBounds.left + viewBounds.width - borderDistance);
-    // Top
     position.y = std::max(position.y, viewBounds.top + borderDistance);
     position.y = std::min(position.y, viewBounds.top + viewBounds.height - borderDistance);
     mPlayerAircraft->setPosition(position);
-    // *****************
-
-    mSceneGraph.update(dt);
 }
 
-CommandQueue& World::getCommandQueue() {
-    return mCommandQueue;
+void World::adaptPlayerVelocity()
+{
+    sf::Vector2f velocity = mPlayerAircraft->getVelocity();
+
+    // If moving diagonally, reduce velocity (to have always same velocity)
+    if (velocity.x != 0.f && velocity.y != 0.f)
+        mPlayerAircraft->setVelocity(velocity / std::sqrt(2.f));
+
+    // Add scrolling velocity
+    mPlayerAircraft->accelerate(0.f, mScrollSpeed);
 }
